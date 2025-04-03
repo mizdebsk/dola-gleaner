@@ -15,6 +15,9 @@
  */
 package io.kojan.dola.gleaner;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -217,6 +220,26 @@ public class Gleaner {
         };
     }
 
+    private void output() {
+        logger.info("BEGIN MAVEN BUILD DEPENDENCIES");
+        for (String br : brs) {
+            logger.info("\rBuildRequires:  {}", br);
+        }
+        logger.info("END MAVEN BUILD DEPENDENCIES");
+        String outFileProp = System.getProperty("dola.gleaner.outputFile");
+        if (outFileProp != null) {
+            Path path = Path.of(outFileProp);
+            try (Writer w = Files.newBufferedWriter(path)) {
+                for (String br : brs) {
+                    w.write(br);
+                    w.write("\n");
+                }
+            } catch (IOException e) {
+                logger.error("I/O exception when writing output file " + path, e);
+            }
+        }
+    }
+
     public void execute(MavenSession mavenSession) {
         session = mavenSession.getSession();
 
@@ -239,9 +262,7 @@ public class Gleaner {
 
         if (!resolveDeps()) {
             logger.error("Missing model dependencies");
-            for (String br : brs) {
-                logger.info("\rBuildRequires:  {}", br);
-            }
+            output();
             return;
         }
 
@@ -257,9 +278,7 @@ public class Gleaner {
 
         if (!resolveDeps()) {
             logger.error("Missing plan dependencies");
-            for (String br : brs) {
-                logger.info("\rBuildRequires:  {}", br);
-            }
+            output();
             return;
         }
 
@@ -320,14 +339,10 @@ public class Gleaner {
         }
         if (!resolveDeps()) {
             logger.error("Missing exec dependencies");
-            for (String br : brs) {
-                logger.info("\rBuildRequires:  {}", br);
-            }
+            output();
             return;
         }
         logger.info("BUILD DEPS READY");
-        for (String br : brs) {
-            logger.info("\rBuildRequires:  {}", br);
-        }
+        output();
     }
 }
