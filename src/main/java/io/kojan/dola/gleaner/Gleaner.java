@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
@@ -221,10 +222,11 @@ public class Gleaner {
     }
 
     private void output() {
-        logger.info("BEGIN MAVEN BUILD DEPENDENCIES");
-        for (String br : brs) {
-            logger.info("\rBuildRequires:  {}", br);
-        }
+        logger.info(
+                "BEGIN MAVEN BUILD DEPENDENCIES"
+                        + brs.stream()
+                                .map(br -> "\nBuildRequires:  " + br)
+                                .collect(Collectors.joining()));
         logger.info("END MAVEN BUILD DEPENDENCIES");
         String outFileProp = System.getProperty("dola.gleaner.outputFile");
         if (outFileProp != null) {
