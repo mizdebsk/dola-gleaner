@@ -22,7 +22,7 @@
     <version>8</version>
   </parent>
   <artifactId>dola-gleaner</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.1.0</version>
   <name>Dola Gleaner</name>
   <description>Maven 4 extension for extracting build dependencies</description>
   <url>https://github.com/mizdebsk/dola-gleaner</url>
