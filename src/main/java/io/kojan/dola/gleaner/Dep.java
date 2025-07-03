@@ -30,10 +30,21 @@ class Dep {
     Boolean resolved;
 
     static String rpmDepString(
-            String groupId, String artifactId, String classifier, String extension) {
+            String groupId,
+            String artifactId,
+            String extension,
+            String classifier,
+            String version,
+            String packageVersion,
+            String namespace) {
         boolean customExtension = !extension.equals("jar");
         boolean customClassifier = !classifier.equals("");
+        boolean customVersion = !version.equals("SYSTEM");
         StringBuilder sb = new StringBuilder();
+        if (namespace != null && !namespace.isBlank()) {
+            sb.append(namespace);
+            sb.append("-");
+        }
         sb.append("mvn(");
         sb.append(groupId);
         sb.append(":");
@@ -48,10 +59,17 @@ class Dep {
             sb.append(":");
             sb.append(classifier);
         }
-        if (customClassifier || customExtension) {
+        if (customClassifier || customExtension || customVersion) {
             sb.append(":");
         }
+        if (customVersion) {
+            sb.append(version);
+        }
         sb.append(")");
+        if (packageVersion != null) {
+            sb.append(" = ");
+            sb.append(packageVersion);
+        }
         return sb.toString();
     }
 
@@ -76,6 +94,6 @@ class Dep {
 
     public Dep(String groupId, String artifactId, String extension, String version) {
         this.id = groupId + ':' + artifactId + ':' + extension + ':' + version;
-        this.rpmDepString = rpmDepString(groupId, artifactId, "", extension);
+        this.rpmDepString = rpmDepString(groupId, artifactId, extension, "", "SYSTEM", null, null);
     }
 }
