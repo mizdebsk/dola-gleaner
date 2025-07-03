@@ -37,13 +37,19 @@ public class Collector {
                         coords.getGroupId(),
                         coords.getArtifactId(),
                         coords.getExtension(),
+                        coords.getClassifier(),
                         coords.getVersionConstraint().asString());
         dep.coords = coords;
         return dep;
     }
 
-    synchronized Dep lookup(String groupId, String artifactId, String extension, String version) {
-        Dep dep = new Dep(groupId, artifactId, extension, version);
+    synchronized Dep lookup(
+            String groupId,
+            String artifactId,
+            String extension,
+            String classifier,
+            String version) {
+        Dep dep = new Dep(groupId, artifactId, extension, classifier, version);
         return deps.computeIfAbsent(dep.id, x -> dep);
     }
 

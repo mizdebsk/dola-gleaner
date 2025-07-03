@@ -67,7 +67,11 @@ public class DolaGleanerBuildPluginManager implements BuildPluginManager {
 
         Dep dep =
                 collector.lookup(
-                        plugin.getGroupId(), plugin.getArtifactId(), "jar", plugin.getVersion());
+                        plugin.getGroupId(),
+                        plugin.getArtifactId(),
+                        "jar",
+                        "",
+                        plugin.getVersion());
         try {
             MojoDescriptor mojo =
                     mavenPluginManager.getMojoDescriptor(plugin, goal, repositories, session);

@@ -24,10 +24,15 @@ import org.apache.maven.api.model.InputSource;
 
 class Dep {
     final String id;
-    final String rpmDepString;
+    final String groupId;
+    final String artifactId;
+    final String extension;
+    final String classifier;
+    final String requestedVersion;
     ArtifactCoordinates coords;
     final Set<String> foundLocations = new TreeSet<>();
     Boolean resolved;
+    String resolvedVersion;
 
     static String rpmDepString(
             String groupId,
@@ -73,6 +78,11 @@ class Dep {
         return sb.toString();
     }
 
+    String rpmDepString() {
+        return rpmDepString(
+                groupId, artifactId, extension, classifier, resolvedVersion, null, null);
+    }
+
     private String location(InputLocationTracker obj) {
         InputLocation location = obj.getLocation("");
         if (location == null) {
@@ -92,8 +102,30 @@ class Dep {
         foundLocations.add(location(location));
     }
 
-    public Dep(String groupId, String artifactId, String extension, String version) {
-        this.id = groupId + ':' + artifactId + ':' + extension + ':' + version;
-        this.rpmDepString = rpmDepString(groupId, artifactId, extension, "", "SYSTEM", null, null);
+    public Dep(
+            String groupId,
+            String artifactId,
+            String extension,
+            String classifier,
+            String version) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.extension = extension;
+        this.classifier = classifier;
+        this.requestedVersion = version;
+        this.id = groupId + ':' + artifactId + ':' + extension + ':' + classifier + ':' + version;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Dep other) {
+            return id.equals(other.id);
+        }
+        return false;
     }
 }

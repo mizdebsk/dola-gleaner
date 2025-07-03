@@ -75,6 +75,9 @@ public class Gleaner {
 
     private Session session;
 
+    private DependencyFilter filter;
+    private CompatVersionResolver compatVersionResolver;
+
     static void checkVersionRange(ArtifactCoordinates coords) {
         if (coords.getVersionConstraint().getVersionRange() != null) {
             throw new RuntimeException("Version ranges are not supported: " + coords);
@@ -142,6 +145,19 @@ public class Gleaner {
         dep.foundAt(plugin);
     }
 
+    private void addDep(Dep dep) {
+        if (filter.isDependencyFiltered(dep)) {
+            logger.warn("Dependency {} is filtered", dep.id);
+            return;
+        }
+        String version = compatVersionResolver.resolveVersionFor(dep);
+        if (!version.equals("SYSTEM")) {
+            logger.info("Using compat version {} for {}", version, dep.id);
+        }
+        dep.resolvedVersion = version;
+        brs.add(dep.rpmDepString());
+    }
+
     private boolean resolveDeps() {
         brs.clear();
         List<Dep> unresolved = new ArrayList<>();
@@ -168,7 +184,6 @@ public class Gleaner {
                         .toList();
         boolean unresolvedStrong = false;
         for (Dep dep : strong) {
-            brs.add(dep.rpmDepString);
             if (dep.resolved) {
                 logger.info("Strong dependency: {}", dep.id);
             } else {
@@ -178,6 +193,7 @@ public class Gleaner {
             for (String location : dep.foundLocations) {
                 logger.info("  declared at {}", location);
             }
+            addDep(dep);
         }
         if (unresolved.isEmpty()) {
             return true;
@@ -187,8 +203,8 @@ public class Gleaner {
         }
         for (Dep dep : unresolved) {
             if (!dep.resolved) {
-                brs.add(dep.rpmDepString);
                 logger.error("Unresolved weak dependency: {}", dep.id);
+                addDep(dep);
             }
         }
         return false;
@@ -243,6 +259,10 @@ public class Gleaner {
     }
 
     public void execute(MavenSession mavenSession) {
+
+        filter = DependencyFilter.parseFromProperties(System.getProperties());
+        compatVersionResolver = CompatVersionResolver.parseFromProperties(System.getProperties());
+
         session = mavenSession.getSession();
 
         List<MavenProject> allProjects = mavenSession.getAllProjects();
