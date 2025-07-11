@@ -38,7 +38,7 @@ public class Collector {
                         coords.getArtifactId(),
                         coords.getExtension(),
                         coords.getClassifier(),
-                        coords.getVersionConstraint().asString());
+                        coords.getVersionConstraint().toString());
         dep.coords = coords;
         return dep;
     }
