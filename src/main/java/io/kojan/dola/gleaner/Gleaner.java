@@ -66,7 +66,7 @@ public class Gleaner {
     private MavenProject lookupReactor(ArtifactCoordinates coords) {
         String groupId = coords.getGroupId();
         String artifactId = coords.getArtifactId();
-        String version = coords.getVersionConstraint().getRecommendedVersion().asString();
+        String version = coords.getVersionConstraint().getRecommendedVersion().toString();
         return reactorMap
                 .getOrDefault(groupId, Map.of())
                 .getOrDefault(artifactId, Map.of())
