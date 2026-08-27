@@ -32,7 +32,7 @@
   </scm>
   <properties>
     <kojan.javaRelease>17</kojan.javaRelease>
-    <mavenVersion>4.0.0-rc-5</mavenVersion>
+    <mavenVersion>4.0.0-rc-6</mavenVersion>
   </properties>
   <dependencies>
     <dependency>
